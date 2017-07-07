@@ -1,8 +1,20 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import registerServiceWorker from './registerServiceWorker';
+import { render } from 'react-dom';
 
-ReactDOM.render(<App />, document.getElementById('root'));
-registerServiceWorker();
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+
+import GreetingDemo from './pub-sub/greeting-demo';
+import { About } from './about'
+
+render(
+    <div>
+      <h1>React Demos</h1> 
+      <Router>
+        <div>
+          <Route path="/about" component={About}></Route>
+          <Route exact path="/greeting" component={GreetingDemo}></Route>
+        </div>
+      </Router>
+    </div>,
+    document.getElementById('root')
+);
