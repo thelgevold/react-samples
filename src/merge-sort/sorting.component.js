@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { SortingService } from './sorting-service';
 import { Partition } from './partition';
-import 'rxjs/add/operator/delay';
-import 'rxjs/add/operator/map';
 
 export class SortingComponent extends Component {
+
+  unsorted = [55, 1, 2, 4, 9, 77, 3, 65, -1, 999];
 
   constructor() {
     super();
@@ -14,56 +14,48 @@ export class SortingComponent extends Component {
   }
 
   componentDidMount() {
-    
-    this.sortingService
-        .notifier
-        //.delay(1000)
-        .map(i => i)
-        .subscribe(res => {
-
-          let partitions = this.state.partitions;
-      
-          let node = partitions.find(p => p.parentId === res.parentId);
-          
-          if(!node) {
-            node = {fragments: [], parentId: res.parentId};
-            partitions.push(node);
-          }
-          
-          let itms = res.items.map(itm => {
-            return itm;
-          });
-
-          node.fragments.push(itms);
-
-          this.setState({partitions: partitions});
-        });
-  
-    let partition = new Partition(0, [55, 1, 2, 4, 9, 77, 3, 65]);
-    this.sortingService.mergeSort(partition);    
+    let partition = new Partition(0, this.unsorted);
+    this.sortingService.mergeSort(partition);
+    this.setState({partitions: this.sortingService.partitions});   
   }
 
   render() {
-    
-    let fragments = this.state.partitions.map((key, index) => {
-         return <div key={index} className="fragment-row">
-         {
-          key.fragments.map((numbers, index) =>
-            <span className="group" key={index}>
-            {
-              numbers.map((number, index) => {
-                return <span key={index} className="number">{number}</span>
-              })
-            }
-            </span>
-          )
-        }
-</div>
-      });
-    
+    let fragments = this.state.partitions.map((node, i1) => {
+        return <div key={i1} className="fragment-row" >
+                {
+                  node.fragments.map((numbers, i2) =>
+                  <span>
+                    <span className="group" key={i2}>
+                    {
+                      numbers.map((number, index) => {
+                        return <span key={index} className="number">{number}</span>
+                      })
+                    }
+                    </span>
+                  </span>
+                  )
+                }
+                <span>{node.descr}</span>
+
+                <span className={node.show}>
+                  {(node.part1 || []).map((n, index) => {
+                    return <span key={index} className="number">{n}</span>
+                  })}
+                </span>
+              
+                <span className="group">
+                  {(node.part2 || []).map((n, index) => {
+                    return <span key={index} className="number">{n}</span>
+                  })}
+                </span>
+              </div>
+    });
     return (
       <div>
         <h4>Merge Sort</h4>
+        <div className="fragment-row">
+          <strong>Sample Numbers: { this.unsorted.join(' ') }</strong>
+        </div>
         {fragments}
       </div>
     );
